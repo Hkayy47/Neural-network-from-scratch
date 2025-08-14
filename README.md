@@ -1,5 +1,6 @@
 # Neural-network-from-scratch
-Making my own neural network because my brain's doesn't work :( 
+Making my own neural network because my brain's doesn't work
+
 We will be using Mnist dataset, problem we will be tackling is digit classification (handwritten digits)
 
 Each image is 28x28 so 784 pixels overall

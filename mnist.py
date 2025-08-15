@@ -13,6 +13,9 @@ X_dev = data_dev[1:n]
 data_train = data[1000:m].T
 Y_train = data_train[0]
 X_train = data_train[1:n]
+X_train = X_train / 255
+_,m_train = X_train.shape
+
 
 
 def init_params():
@@ -27,9 +30,8 @@ def ReLU(Z):
     return np.maximum(0,Z)
     
 def softmax(Z):
-    Z_shift = Z - np.max(Z, axis=0, keepdims=True)  # numerical stability
-    expZ = np.exp(Z_shift)
-    return expZ / np.sum(expZ, axis=0, keepdims=True)
+    A = np.exp(Z) / sum(np.exp(Z))
+    return A
 
 
 def forward_propogation(W1,W2,b1,b2,X):
@@ -55,8 +57,8 @@ def backward_propogation(W2,Z1,Z2,X,Y,A1,A2):
     dW2 = 1/m * dz2.dot(A1.T)
     dZ1 = W2.T.dot(dz2) * deriv_ReLU(Z1)
     dW1 = 1/m * dZ1.dot(X.T)
-    db2 = (1/m) * np.sum(dz2, axis=1, keepdims=True)
-    db1 = (1/m) * np.sum(dZ1, axis=1, keepdims=True)
+    db2 = 1 / m * np.sum(dz2)
+    db1 = 1 / m * np.sum(dZ1)
 
     
     return dW1, db1, dW2, db2    
@@ -90,7 +92,27 @@ def gradient_descent(X, Y,learning_rate, num_iterations):
     return W1, b1, W2, b2
 
 
+def make_predictions(X, W1, b1, W2, b2):
+    _, _, _, A2 = forward_propogation(W1, b1, W2, b2, X)
+    predictions = get_predictions(A2)
+    return predictions
+
+def test_prediction(index, W1, b1, W2, b2):
+    current_image = X_train[:, index, None]
+    prediction = make_predictions(X_train[:, index, None], W1, b1, W2, b2)
+    label = Y_train[index]
+    print("Prediction: ", prediction)
+    print("Label: ", label)
+    
+    current_image = current_image.reshape((28, 28)) * 255
+    plt.gray()
+    plt.imshow(current_image, interpolation='nearest')
+    plt.show()
+    
+    
 W1, b1, W2, b2 = gradient_descent(X_train, Y_train, 0.1, 500)
     
+
+
     
     
